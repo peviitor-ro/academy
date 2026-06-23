@@ -1,2 +1,1 @@
-  # AOC academy
-platform where new volunteers can learn programming and testing
+Academia peViitor Work in Progress

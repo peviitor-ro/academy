@@ -1,0 +1,116 @@
+---
+import logoDark from '../assets/logo/logo-desktop-dark.png';
+import logoLight from '../assets/logo/logo-desktop-light.png';
+import { Icon } from 'astro-icon/components';
+import ThemeToggle from './ThemeToggle.astro';
+import LanguageToggle from './LanguageToggle.astro';
+import { getLangFromURL, useTranslation, useTranslatedPath } from '../i18n/utils';
+import type { routes, ui } from '../i18n/ui';
+
+const language = getLangFromURL(Astro.url);
+const translation = useTranslation(language);
+const translatePath = useTranslatedPath(language);
+
+interface NavItem {
+  key: keyof typeof routes.ro;
+  label: keyof typeof ui.ro;
+}
+
+const navItems: NavItem[] = [
+  { key: 'catalog', label: 'nav.catalog' },
+  { key: 'onboarding', label: 'nav.onboarding' },
+  { key: 'mentors', label: 'nav.mentors' },
+  { key: 'resources', label: 'nav.resources' },
+  { key: 'get-involved', label: 'nav.getInvolved' },
+];
+
+
+const isActive = (pathKey: keyof typeof routes.ro) => {
+  const currentPath = Astro.url.pathname;
+  const localizedPath = translatePath(pathKey);
+  return currentPath.replace(/\/$/,"") === localizedPath.replace(/\/$/,"")
+}
+---
+
+<header
+  class="relative z-50 flex flex-wrap items-center justify-between py-4 bg-beige-500 dark:bg-dark-500 transition-colors duration-300 gap-y-4 min-[820px]:flex-nowrap"
+>
+  <a href={translatePath('home')} class="flex items-center px-4 gap-4 order-1">
+    <span class="relative inline-block w-38 h-12">
+      <img
+        src={logoLight.src}
+        alt="Logo light"
+        class="absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ease-in-out opacity-100 dark:opacity-0"
+      />
+      <img
+        src={logoDark.src}
+        alt="Logo dark"
+        class="absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ease-in-out opacity-0 dark:opacity-100"
+      />
+    </span>
+  </a>
+
+  <nav
+    id="navMenu"
+    class="fixed top-20 left-0 w-full h-[calc(100dvh-80px)] bg-beige-500 dark:bg-dark-500 z-40 flex flex-col items-center justify-start gap-8 py-8 border-t border-dark-400 opacity-0 pointer-events-none transition-all duration-300 ease-in-out
+           min-[500px]:static min-[500px]:bg-transparent min-[500px]:h-auto min-[500px]:order-3 min-[500px]:w-full min-[500px]:justify-center min-[500px]:p-2 min-[500px]:opacity-100 min-[500px]:pointer-events-auto min-[500px]:flex-row min-[500px]:border-t min-[500px]:border-dark-400
+           min-[820px]:border-t-0 min-[820px]:order-2 min-[820px]:w-auto min-[820px]:p-0 min-[820px]:items-center"
+  > 
+    <ul class="flex flex-col items-center gap-6 min-[500px]:flex-row min-[500px]:items-center">
+      {navItems.map((item) => (
+        <li>
+          <a
+            href={translatePath(item.key)}
+            class={`text-md font-semibold tracking-wide transition-colors dark:text-primary-dark dark:hover:text-pastel-blue-200 text-primary-light hover:text-green-700 duration-300 border-b-2 pb-1
+              ${isActive(item.key) 
+                ? 'border-primary-light hover:border-green-700 dark:border-primary-dark dark:hover:border-pastel-blue-200' 
+                : 'text-beige-800 dark:text-dark-200 border-transparent'}`}
+          >
+            {translation(item.label)}
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <div class="flex flex-row items-center justify-center gap-6 mt-2 pt-6 border-t border-green-200 dark:border-dark-400 w-full min-[500px]:hidden transition-colors duration-300">
+      <ThemeToggle />
+      <LanguageToggle />
+    </div>
+  </nav>
+
+  <div class="flex flex-row items-center justify-end gap-4 px-4 order-2 min-[500px]:w-38 min-[820px]:order-3">
+    <div class="hidden min-[500px]:flex flex-row items-center gap-4">
+      <ThemeToggle />
+      <LanguageToggle />
+    </div>
+
+    <button
+      id="menuToggle"
+      class="cursor-pointer min-[500px]:hidden text-primary-light dark:text-primary-dark flex items-center justify-center"
+      aria-label="Toggle Menu"
+    >
+      <Icon name="bx:menu" class="w-8 h-8" id="menuIconOpen" />
+      <Icon name="bx:x" class="w-8 h-8 hidden" id="menuIconClose" />
+    </button>
+  </div>
+</header>
+
+<script>
+  const menuToggle = document.getElementById('menuToggle');
+  const navMenu = document.getElementById('navMenu');
+  const menuIconOpen = document.getElementById('menuIconOpen');
+  const menuIconClose = document.getElementById('menuIconClose');
+
+  if (menuToggle && navMenu && menuIconOpen && menuIconClose) {
+    menuToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('opacity-0');
+      navMenu.classList.toggle('opacity-100');
+      
+      navMenu.classList.toggle('pointer-events-none');
+      navMenu.classList.toggle('pointer-events-auto');
+      
+      menuIconOpen.classList.toggle('hidden');
+      menuIconClose.classList.toggle('hidden');
+    });
+  }
+</script>

@@ -1,0 +1,72 @@
+---
+import { getLangFromURL, useTranslation, useTranslatedPath } from '../i18n/utils';
+import type { routes, ui } from '../i18n/ui';
+import { Icon } from 'astro-icon/components';
+
+const language = getLangFromURL(Astro.url);
+const translation = useTranslation(language);
+const t = useTranslatedPath(language);
+
+interface NavItem {
+  key: keyof typeof routes.ro;
+  label: keyof typeof ui.ro;
+}
+
+const navItems: NavItem[] = [
+  { key: 'onboarding', label: 'nav.onboarding' },
+  { key: 'mentors', label: 'nav.mentors' },
+  { key: 'resources', label: 'nav.resources' },
+];
+
+---
+<footer
+  class="p-6 bg-beige-500 dark:bg-dark-500 text-center border-t border-beige-700 dark:border-dark-400 mt-auto transition-colors duration-300"
+>
+  <div class="flex flex-wrap flex-row justify-between gap-6 gap-y-8" >
+    <p class="text-md text-left w-60">
+        {translation('footer.description')}
+    </p>
+
+    <div class="flex flex-col gap-4">
+      <h3 class=" font-semibold text-lg">{translation("footer.links")}</h3>
+
+        <ul class="flex flex-col items-start gap-2">
+          {navItems.map((item) => (
+        <li>
+          <a
+            href={t(item.key)}
+            class="text-md font-normal tracking-wide transition-colors dark:text-primary-dark dark:hover:text-pastel-blue-200 text-primary-light hover:text-green-700 duration-300"
+          >
+            {translation(item.label)}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>  
+
+  <div class="flex flex-col gap-4">
+    <h3 class="font-semibold text-lg">{translation("footer.contact")}</h3>
+    <div class="flex flex-row gap-4 w-full justify-center">
+  <a 
+      href="https://discord.gg/KPMkdUfQNu" 
+      target="_blank"
+      rel="noopener noreferrer"
+      class="p-1 text-primary-light dark:text-primary-dark hover:bg-beige-600/40 hover:text-green-700 dark:hover:bg-dark-400/40 dark:hover:text-pastel-blue-200 transition-colors duration-300 rounded-full"
+    >
+    <Icon name="ri:discord-fill" class="w-8 h-8" />
+  </a>
+
+  <a 
+    href="https://www.linkedin.com/company/asociatia-oportunitati-si-cariere/posts/?feedView=all" 
+    target="_blank"
+    rel="noopener noreferrer"
+    class="p-1 text-primary-light dark:text-primary-dark hover:bg-beige-600/40 hover:text-green-700 dark:hover:bg-dark-400/40 dark:hover:text-pastel-blue-200 transition-colors duration-300 rounded-full"
+  >
+    <Icon name="ri:linkedin-fill" class="w-8 h-8" />
+  </a>
+</div>
+</div>
+  <!-- <p class="text-sm text-beige-900 dark:text-dark-200">
+    &copy; {new Date().getFullYear()} {translation('footer.rights')}
+  </p> -->
+</footer>

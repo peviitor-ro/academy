@@ -1,0 +1,22 @@
+---
+import roFlag from '../assets/flags/ro.png';
+import enFlag from '../assets/flags/en.png';
+
+import { getLangFromURL, getRouteFromPath, useTranslatedPath } from '../i18n/utils';
+const language = getLangFromURL(Astro.url);
+
+const targetLanguage = language === 'ro' ? 'en' : 'ro';
+const routeKey = getRouteFromPath(Astro.url.pathname);
+const translatePathToTarget = useTranslatedPath(targetLanguage);
+const targetURL = translatePathToTarget(routeKey);
+---
+
+<a href={targetURL}>
+  {
+    language === 'ro' ? (
+      <img src={enFlag.src} alt="English" class="w-6 h-6" />
+    ) : (
+      <img src={roFlag.src} alt="Romanian" class="w-6 h-6" />
+    )
+  }
+</a>
