@@ -24,12 +24,11 @@ const navItems: NavItem[] = [
   { key: 'get-involved', label: 'nav.getInvolved' },
 ];
 
-
 const isActive = (pathKey: keyof typeof routes.ro) => {
   const currentPath = Astro.url.pathname;
   const localizedPath = translatePath(pathKey);
-  return currentPath.replace(/\/$/,"") === localizedPath.replace(/\/$/,"")
-}
+  return currentPath.replace(/\/$/, '') === localizedPath.replace(/\/$/, '');
+};
 ---
 
 <header
@@ -55,30 +54,38 @@ const isActive = (pathKey: keyof typeof routes.ro) => {
     class="fixed top-20 left-0 w-full h-[calc(100dvh-80px)] bg-beige-500 dark:bg-dark-500 z-40 flex flex-col items-center justify-start gap-8 py-8 border-t border-dark-400 opacity-0 pointer-events-none transition-all duration-300 ease-in-out
            min-[500px]:static min-[500px]:bg-transparent min-[500px]:h-auto min-[500px]:order-3 min-[500px]:w-full min-[500px]:justify-center min-[500px]:p-2 min-[500px]:opacity-100 min-[500px]:pointer-events-auto min-[500px]:flex-row min-[500px]:border-t min-[500px]:border-dark-400
            min-[820px]:border-t-0 min-[820px]:order-2 min-[820px]:w-auto min-[820px]:p-0 min-[820px]:items-center"
-  > 
+  >
     <ul class="flex flex-col items-center gap-6 min-[500px]:flex-row min-[500px]:items-center">
-      {navItems.map((item) => (
-        <li>
-          <a
-            href={translatePath(item.key)}
-            class={`text-md font-semibold tracking-wide transition-colors dark:text-primary-dark dark:hover:text-pastel-blue-200 text-primary-light hover:text-green-700 duration-300 border-b-2 pb-1
-              ${isActive(item.key) 
-                ? 'border-primary-light hover:border-green-700 dark:border-primary-dark dark:hover:border-pastel-blue-200' 
-                : 'text-beige-800 dark:text-dark-200 border-transparent'}`}
-          >
-            {translation(item.label)}
-          </a>
-        </li>
-      ))}
+      {
+        navItems.map((item) => (
+          <li>
+            <a
+              href={translatePath(item.key)}
+              class={`text-md font-semibold tracking-wide transition-colors dark:text-primary-dark dark:hover:text-pastel-blue-200 text-primary-light hover:text-green-700 duration-300 border-b-2 pb-1
+              ${
+                isActive(item.key)
+                  ? 'border-primary-light hover:border-green-700 dark:border-primary-dark dark:hover:border-pastel-blue-200'
+                  : 'text-beige-800 dark:text-dark-200 border-transparent'
+              }`}
+            >
+              {translation(item.label)}
+            </a>
+          </li>
+        ))
+      }
     </ul>
 
-    <div class="flex flex-row items-center justify-center gap-6 mt-2 pt-6 border-t border-green-200 dark:border-dark-400 w-full min-[500px]:hidden transition-colors duration-300">
+    <div
+      class="flex flex-row items-center justify-center gap-6 mt-2 pt-6 border-t border-green-200 dark:border-dark-400 w-full min-[500px]:hidden transition-colors duration-300"
+    >
       <ThemeToggle />
       <LanguageToggle />
     </div>
   </nav>
 
-  <div class="flex flex-row items-center justify-end gap-4 px-4 order-2 min-[500px]:w-38 min-[820px]:order-3">
+  <div
+    class="flex flex-row items-center justify-end gap-4 px-4 order-2 min-[500px]:w-38 min-[820px]:order-3"
+  >
     <div class="hidden min-[500px]:flex flex-row items-center gap-4">
       <ThemeToggle />
       <LanguageToggle />
@@ -105,10 +112,10 @@ const isActive = (pathKey: keyof typeof routes.ro) => {
     menuToggle.addEventListener('click', () => {
       navMenu.classList.toggle('opacity-0');
       navMenu.classList.toggle('opacity-100');
-      
+
       navMenu.classList.toggle('pointer-events-none');
       navMenu.classList.toggle('pointer-events-auto');
-      
+
       menuIconOpen.classList.toggle('hidden');
       menuIconClose.classList.toggle('hidden');
     });

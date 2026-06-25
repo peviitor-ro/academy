@@ -5,7 +5,7 @@ import { Icon } from 'astro-icon/components';
 
 const language = getLangFromURL(Astro.url);
 const translation = useTranslation(language);
-const t = useTranslatedPath(language);
+const translatePath = useTranslatedPath(language);
 
 interface NavItem {
   key: keyof typeof routes.ro;
@@ -34,7 +34,7 @@ const navItems: NavItem[] = [
           {navItems.map((item) => (
         <li>
           <a
-            href={t(item.key)}
+            href={translatePath(item.key)}
             class="text-md font-normal tracking-wide transition-colors dark:text-primary-dark dark:hover:text-pastel-blue-200 text-primary-light hover:text-green-700 duration-300"
           >
             {translation(item.label)}
