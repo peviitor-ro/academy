@@ -34,6 +34,17 @@ const langauge = getLangFromURL(Astro.url);
         document.documentElement.classList.add('dark');
       }
 
+      if (window.location.pathname === "/" && !localStorage.getItem("user-language")) {
+        const browserLang = navigator.language || navigator.userLanguage;
+
+        if (!browserLang.startsWith("ro")) {
+          localStorage.setItem("user-language", "en");
+          window.location.href = "/en/"
+        } else {
+          localStorage.setItem("user-language", "ro");
+        }
+      }
+
       window.localStorage.setItem('theme', theme);
     </script>
   </head>

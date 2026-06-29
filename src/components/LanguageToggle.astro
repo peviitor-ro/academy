@@ -11,7 +11,7 @@ const translatePathToTarget = useTranslatedPath(targetLanguage);
 const targetURL = translatePathToTarget(routeKey);
 ---
 
-<a href={targetURL}>
+<a href={targetURL} class="lang-toggle" data-lang-target={targetLanguage}>
   {
     language === 'ro' ? (
       <img src={enFlag.src} alt="English" class="w-6 h-6" />
@@ -20,3 +20,15 @@ const targetURL = translatePathToTarget(routeKey);
     )
   }
 </a>
+
+<script>
+  const toggleLink = document.querySelector(".lang-toggle");
+  if (toggleLink) {
+    toggleLink.addEventListener("click", () => {
+const targetLang = toggleLink.getAttribute("data-lang-target");
+if (targetLang) {
+  localStorage.setItem("user-language", targetLang);
+}
+    })
+  }
+</script>
