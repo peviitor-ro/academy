@@ -1,0 +1,23 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import TutorialContent from '../../../components/TutorialContent.astro';
+import { getTutorials, getTutorialSlug, type Tutorial } from '../../../lib/tutorials';
+
+export async function getStaticPaths() {
+  const tutorials = await getTutorials('en');
+  return tutorials.map((entry) => ({
+    params: { slug: getTutorialSlug(entry) },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: Tutorial;
+}
+
+const { entry } = Astro.props;
+---
+
+<Layout title={entry.data.title} description={entry.data.description}>
+  <TutorialContent entry={entry} lang="en" />
+</Layout>

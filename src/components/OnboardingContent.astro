@@ -1,0 +1,189 @@
+---
+import { DISCORD_URL } from '../lib/links';
+import PageBackdrop from './ui/PageBackdrop.astro';
+import { buttonClass, cardClass, chipClass, eyebrowClass, gradientTextClass } from './ui/styles';
+import { getSeries, getTutorialSlug, getTutorials } from '../lib/tutorials';
+import { useTranslatedPath } from '../i18n/utils';
+
+interface Props {
+  lang: 'ro' | 'en';
+}
+
+const { lang } = Astro.props;
+const translatePath = useTranslatedPath(lang);
+
+const copy = {
+  ro: {
+    eyebrow: 'Ghid de pornire',
+    title: 'Începe să înveți, pas cu pas',
+    subtitle: 'Șase pași scurți, de la alegerea unui domeniu până la prima lecție terminată. Nu ai nevoie de cont.',
+    progress: 'Progresul tău',
+    lessonsSeen: 'lecții văzute',
+    step: 'Pasul',
+    seen: 'Văzută',
+    catalog: 'Deschide catalogul',
+    lesson: 'Începe lecția',
+    discord: 'Intră pe Discord',
+    involved: 'Implică-te',
+    tools: 'Instrumente gratuite',
+    steps: [
+      { title: 'Alege un domeniu', text: 'Răsfoiește catalogul pe domenii și niveluri sau caută direct o temă. Dacă ești la început, alege nivelul Începător.' },
+      { title: 'Urmărește prima lecție', text: 'Fiecare lecție are video și text. Poți privi, citi sau ambele, în ritmul tău.' },
+      { title: 'Bifează ce ai terminat', text: 'La finalul unei lecții o marchezi ca văzută. Progresul rămâne în browserul tău, fără cont, și îl vezi în serie și pe pagina de start.' },
+      { title: 'Pregătește-ți calculatorul', text: 'Pentru lecțiile practice îți trebuie un editor de cod, Git și Node.js. Toate sunt gratuite.' },
+      { title: 'Cere ajutor când te blochezi', text: 'Întreabă în comunitatea peViitor pe Discord. Spune ce ai încercat și ce eroare apare, ca să te poată ajuta repede.' },
+      { title: 'Contribuie', text: 'Ai găsit o greșeală sau vrei să scrii o lecție? Propune o modificare printr-un pull request.' },
+    ],
+  },
+  en: {
+    eyebrow: 'Getting started',
+    title: 'Start learning, step by step',
+    subtitle: 'Six short steps, from picking a domain to finishing your first lesson. You do not need an account.',
+    progress: 'Your progress',
+    lessonsSeen: 'lessons seen',
+    step: 'Step',
+    seen: 'Seen',
+    catalog: 'Open the catalog',
+    lesson: 'Start the lesson',
+    discord: 'Join Discord',
+    involved: 'Get involved',
+    tools: 'Free tools',
+    steps: [
+      { title: 'Pick a domain', text: 'Browse the catalog by domain and level, or search for a topic. If you are just starting, choose the Beginner level.' },
+      { title: 'Follow your first lesson', text: 'Every lesson has video and text. Watch, read or both, at your own pace.' },
+      { title: 'Check off what you finished', text: 'At the end of a lesson you mark it as seen. Your progress stays in your browser, no account needed, and shows in the series and on the home page.' },
+      { title: 'Set up your computer', text: 'For hands-on lessons you need a code editor, Git and Node.js. All are free.' },
+      { title: 'Ask for help when stuck', text: 'Ask in the peViitor community on Discord. Say what you tried and what error you got, so people can help quickly.' },
+      { title: 'Contribute', text: 'Found a mistake or want to write a lesson? Propose a change with a pull request.' },
+    ],
+  },
+}[lang];
+
+const tutorials = await getTutorials(lang);
+const allSeries = getSeries(tutorials);
+const first = allSeries[0]?.lessons[0];
+const firstHref = first ? `${translatePath('tutorials')}/${getTutorialSlug(first)}/` : translatePath('catalog');
+const allIds = allSeries.flatMap((s) => [...s.lessons, ...(s.project ? [s.project] : [])]).map((e) => e.id).join(',');
+
+const tools = [
+  { name: 'VS Code', href: 'https://code.visualstudio.com/' },
+  { name: 'Git', href: 'https://git-scm.com/' },
+  { name: 'Node.js', href: 'https://nodejs.org/' },
+];
+
+const card = `${cardClass} p-6`;
+const primaryButton = buttonClass('primary', 'sm');
+const chip = chipClass;
+
+const actions = [
+  { href: translatePath('catalog'), label: copy.catalog },
+  { href: firstHref, label: copy.lesson },
+  null,
+  null,
+  { href: DISCORD_URL, label: copy.discord, external: true },
+  { href: translatePath('get-involved'), label: copy.involved },
+];
+---
+
+<div class="relative overflow-hidden">
+  <PageBackdrop />
+
+  <section class="mx-auto max-w-3xl px-6 pt-12 pb-12 text-center md:pt-16">
+    <p class={`mb-4 ${eyebrowClass}`}>{copy.eyebrow}</p>
+    <h1 class="text-4xl leading-tight font-extrabold tracking-tight md:text-6xl dark:text-white">
+      <span class={gradientTextClass}>
+        {copy.title}
+      </span>
+    </h1>
+    <p class="mx-auto mt-5 max-w-xl text-lg text-green-600 dark:text-dark-100">{copy.subtitle}</p>
+
+    {allIds && (
+      <div class={`${card} mx-auto mt-8 max-w-md text-left`}>
+        <div class="mb-2 flex justify-between text-sm font-semibold">
+          <span>{copy.progress}</span>
+          <span data-series-ids={allIds} data-label={copy.lessonsSeen}></span>
+        </div>
+        <div
+          role="progressbar"
+          aria-label={copy.progress}
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+          data-bar-ids={allIds}
+          class="h-2 overflow-hidden rounded-full bg-beige-600 dark:bg-white/10"
+        >
+          <div class="h-full w-0 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 transition-[width] duration-500"></div>
+        </div>
+      </div>
+    )}
+  </section>
+
+  <section class="mx-auto max-w-5xl px-6 pb-24">
+    <ol class="relative flex flex-col gap-6 md:gap-10 md:before:absolute md:before:top-0 md:before:left-1/2 md:before:h-full md:before:w-px md:before:-translate-x-1/2 md:before:bg-gradient-to-b md:before:from-blue-400/60 md:before:to-blue-300/60 md:before:content-['']">
+      {copy.steps.map((step, index) => {
+        const right = index % 2 === 1;
+        const action = actions[index];
+        return (
+          <li class="reveal relative md:grid md:grid-cols-2 md:gap-20">
+            <span class="mb-3 inline-block rounded-full border border-blue-500/60 bg-white px-3 py-1 font-mono text-xs font-bold text-blue-800 md:absolute md:top-6 md:left-1/2 md:z-10 md:mb-0 md:-translate-x-1/2 dark:bg-dark-600 dark:text-pastel-blue-400">
+              {copy.step} {index + 1}
+            </span>
+            <div class={`${card} ${right ? 'md:col-start-2' : 'md:col-start-1'}`}>
+              <div class="mb-2 flex items-start justify-between gap-3">
+                <h2 class="text-xl font-bold dark:text-white">{step.title}</h2>
+                {index === 1 && first && (
+                  <span hidden data-seen-id={first.id} class="shrink-0 rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                    ✓ {copy.seen}
+                  </span>
+                )}
+              </div>
+              <p class="text-sm text-green-600 dark:text-dark-100">{step.text}</p>
+              {index === 1 && first && (
+                <p class="mt-2 text-sm font-semibold">{first.data.title}</p>
+              )}
+              {index === 3 && (
+                <div class="mt-4 flex flex-wrap items-center gap-2">
+                  <span class="text-xs text-green-500 dark:text-dark-200">{copy.tools}:</span>
+                  {tools.map((tool) => (
+                    <a href={tool.href} target="_blank" rel="noopener noreferrer" class={chip}>{tool.name}</a>
+                  ))}
+                </div>
+              )}
+              {action && (
+                <a
+                  href={action.href}
+                  class={`${primaryButton} mt-5`}
+                  {...(action.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                >
+                  {action.label}
+                </a>
+              )}
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  </section>
+</div>
+
+<script>
+  import '../scripts/progress-ui';
+
+  // Aparitii la scroll; fara JS sau cu reduced-motion continutul ramane vizibil.
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduce && 'IntersectionObserver' in window) {
+    document.documentElement.classList.add('js-reveal');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.12 },
+    );
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+  }
+</script>

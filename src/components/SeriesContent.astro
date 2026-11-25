@@ -1,0 +1,115 @@
+---
+import { getTutorialSlug, type Series, type Tutorial } from '../lib/tutorials';
+import { useTranslation, useTranslatedPath } from '../i18n/utils';
+
+interface Props {
+  series: Series;
+  lang: 'ro' | 'en';
+}
+
+const { series, lang } = Astro.props;
+const t = useTranslation(lang);
+const translatePath = useTranslatedPath(lang);
+const hrefOf = (entry: Tutorial) => `${translatePath('tutorials')}/${getTutorialSlug(entry)}/`;
+const allEntries = series.project ? [...series.lessons, series.project] : series.lessons;
+const ids = allEntries.map((entry) => entry.id).join(',');
+const totalMin = allEntries.reduce((sum, entry) => sum + (entry.data.durationMin ?? 0), 0);
+const first = series.lessons[0] ?? series.project;
+const linkClass = 'underline hover:text-green-700 dark:hover:text-pastel-blue-200';
+---
+
+<div class="mx-auto max-w-4xl p-6">
+  <a href={translatePath('catalog')} class={`text-sm ${linkClass}`}>← {t('tutorial.backToCatalog')}</a>
+
+  <header class="mt-4 mb-8">
+    <p class="mb-1 text-xs font-semibold uppercase tracking-wide">{t('series.roadmap')}</p>
+    <h1 class="mb-3 text-3xl font-bold">{series.name}</h1>
+    <p class="text-sm text-beige-800 dark:text-dark-200">
+      {series.lessons.length}
+      {t('series.lessons')}
+      {totalMin > 0 && ` · ${totalMin} ${t('tutorial.minutes')}`}
+      {first && ` · ${t(`domain.${first.data.domain}`)} · ${t(`level.${first.data.level}`)}`}
+    </p>
+
+    <div class="mt-4">
+      <div class="mb-1 flex justify-between text-xs font-semibold">
+        <span>{t('series.progress')}</span>
+        <span data-series-ids={ids} data-label={t('progress.lessonsSeen')}></span>
+      </div>
+      <div
+        role="progressbar"
+        aria-label={t('series.progress')}
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+        data-bar-ids={ids}
+        class="h-2 overflow-hidden rounded-full bg-beige-400 dark:bg-dark-400"
+      >
+        <div class="h-full w-0 bg-green-500 transition-[width] duration-300 dark:bg-blue-500"></div>
+      </div>
+    </div>
+  </header>
+
+  <ol class="flex flex-col gap-4">
+    {
+      series.lessons.map((lesson) => (
+        <li>
+          <a
+            href={hrefOf(lesson)}
+            class="group flex gap-4 rounded-xl border border-beige-700 bg-beige-300 p-5 transition-colors duration-300 hover:border-green-500 dark:border-dark-400 dark:bg-dark-600 dark:hover:border-pastel-blue-500"
+          >
+            <span
+              class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-500 text-sm font-bold text-beige-50 dark:bg-blue-500 dark:text-white"
+              aria-hidden="true"
+            >
+              {lesson.data.order}
+            </span>
+            <span class="flex min-w-0 flex-col gap-1">
+              <span class="text-lg font-bold">
+                {lesson.data.title}
+                <span data-seen-id={lesson.id} hidden class="ml-2 text-sm font-semibold">
+                  ✓ {t('progress.seen')}
+                </span>
+              </span>
+              <span class="text-sm text-beige-900 dark:text-dark-100">{lesson.data.description}</span>
+              <span class="mt-1 text-sm font-semibold">
+                {t('series.start')} →
+                {lesson.data.durationMin && (
+                  <span class="ml-2 font-normal text-beige-800 dark:text-dark-200">
+                    {lesson.data.durationMin} {t('tutorial.minutes')}
+                  </span>
+                )}
+              </span>
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+
+  {
+    series.project && (
+      <section class="mt-10 border-t border-beige-700 pt-10 dark:border-dark-400">
+        <div class="rounded-xl bg-green-100 p-8 dark:bg-dark-600">
+          <h2 class="mb-2 text-2xl font-bold">
+            {t('series.project')}: {series.project.data.title}
+            <span data-seen-id={series.project.id} hidden class="ml-2 text-sm font-semibold">
+              ✓ {t('progress.seen')}
+            </span>
+          </h2>
+          <p class="mb-5 text-sm">{series.project.data.description}</p>
+          <a
+            href={hrefOf(series.project)}
+            class="inline-block rounded-full bg-green-500 px-6 py-2 text-sm font-semibold text-beige-50 hover:bg-green-600 dark:bg-blue-500 dark:text-white dark:hover:bg-blue-400"
+          >
+            {t('series.start')}
+          </a>
+        </div>
+      </section>
+    )
+  }
+</div>
+
+<script>
+  import '../scripts/progress-ui';
+</script>

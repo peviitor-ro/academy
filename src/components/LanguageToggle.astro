@@ -11,12 +11,19 @@ const translatePathToTarget = useTranslatedPath(targetLanguage);
 const targetURL = translatePathToTarget(routeKey);
 ---
 
-<a href={targetURL} class="lang-toggle" data-lang-target={targetLanguage}>
+<a
+  href={targetURL}
+  class="lang-toggle"
+  data-lang-target={targetLanguage}
+  title={language === 'ro' ? 'Switch to English' : 'Schimbă în română'}
+  aria-label={language === 'ro' ? 'Limba curentă: română. Switch to English' : 'Current language: English. Schimbă în română'}
+>
   {
+    /* Steagul arata limba curenta; linkul duce la cealalta limba. */
     language === 'ro' ? (
-      <img src={enFlag.src} alt="English" class="w-6 h-6" />
+      <img src={roFlag.src} alt="" class="w-6 h-6" />
     ) : (
-      <img src={roFlag.src} alt="Romanian" class="w-6 h-6" />
+      <img src={enFlag.src} alt="" class="w-6 h-6" />
     )
   }
 </a>

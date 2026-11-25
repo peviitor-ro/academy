@@ -1,22 +1,42 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { getLangFromURL } from '../i18n/utils';
+import { getLangFromURL, withBase } from '../i18n/utils';
+import '../styles/global.css';
 
-const langauge = getLangFromURL(Astro.url);
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const language = getLangFromURL(Astro.url);
+const siteName = 'Academia peViitor';
+const defaultDescription =
+  language === 'ro'
+    ? 'Tutoriale gratuite de tehnologie, create de comunitatea peViitor.'
+    : 'Free technology tutorials created by the peViitor community.';
+const { title, description = defaultDescription } = Astro.props;
+const pageTitle = title ? `${title} | ${siteName}` : siteName;
+const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
-<html lang={langauge}>
+<html lang={language}>
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href={withBase("/favicon.svg")} />
+    <link rel="icon" href={withBase("/favicon.ico")} />
+    <link rel="canonical" href={canonical} />
     <meta name="generator" content={Astro.generator} />
-    <title>Astro Basics</title>
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
 
-    <script is:inline>
+    <script is:inline define:vars={{ base: withBase('/') }}>
       const theme = (() => {
         if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
           return localStorage.getItem('theme');
@@ -34,12 +54,12 @@ const langauge = getLangFromURL(Astro.url);
         document.documentElement.classList.add('dark');
       }
 
-      if (window.location.pathname === "/" && !localStorage.getItem("user-language")) {
+      if (window.location.pathname === base && !localStorage.getItem("user-language")) {
         const browserLang = navigator.language || navigator.userLanguage;
 
         if (!browserLang.startsWith("ro")) {
           localStorage.setItem("user-language", "en");
-          window.location.href = "/en/"
+          window.location.href = base + "en/"
         } else {
           localStorage.setItem("user-language", "ro");
         }
@@ -51,8 +71,16 @@ const langauge = getLangFromURL(Astro.url);
   <body
     class="min-h-screen bg-beige-500 text-primary-light dark:text-primary-dark dark:bg-dark-500 transition-colors duration-300"
   >
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:rounded-lg focus:bg-blue-400 focus:px-4 focus:py-2 focus:font-semibold focus:text-white"
+    >
+      {language === 'ro' ? 'Sari la conținut' : 'Skip to content'}
+    </a>
     <Header />
-    <slot />
+    <main id="main" tabindex="-1" class="outline-none">
+      <slot />
+    </main>
     <Footer />
   </body>
 </html>

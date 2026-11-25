@@ -1,0 +1,14 @@
+---
+import { cardClass } from './styles';
+
+interface Props {
+  as?: 'div' | 'li' | 'section' | 'article';
+  class?: string;
+}
+
+const { as: Tag = 'div', class: extra = '', ...rest } = Astro.props;
+---
+
+<Tag class={`${cardClass} ${extra}`} {...rest}>
+  <slot />
+</Tag>

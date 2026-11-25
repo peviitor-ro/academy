@@ -1,0 +1,194 @@
+---
+import PageBackdrop from './ui/PageBackdrop.astro';
+import TutorialCard from './TutorialCard.astro';
+import { getTutorials } from '../lib/tutorials';
+import { DOMAINS, LEVELS } from '../content.config';
+import { useTranslation } from '../i18n/utils';
+
+interface Props {
+  lang: 'ro' | 'en';
+}
+
+const { lang } = Astro.props;
+const t = useTranslation(lang);
+const tutorials = await getTutorials(lang);
+
+// Afisam doar domeniile si nivelurile care au cel putin un tutorial.
+const domains = DOMAINS.filter((d) => tutorials.some((entry) => entry.data.domain === d));
+const levels = LEVELS.filter((l) => tutorials.some((entry) => entry.data.level === l));
+const selectClass =
+  'h-[46px] w-full rounded-lg border border-beige-700 bg-beige-300 px-4 text-sm dark:border-pastel-blue-900 dark:bg-dark-600 sm:w-60';
+---
+
+<div class="relative overflow-hidden">
+<PageBackdrop />
+<section class="mx-auto max-w-[1392px] p-6">
+  <div class="mb-8 rounded-2xl border border-beige-600 bg-white/60 p-8 dark:border-white/10 dark:bg-dark-600">
+    <h1 class="mb-3 text-3xl font-bold text-primary-light dark:text-primary-dark">
+      {t('catalog.title')}
+    </h1>
+    <p class="max-w-2xl text-lg text-beige-800 dark:text-dark-200">{t('catalog.description')}</p>
+  </div>
+
+  {tutorials.length === 0 && <p>{t('catalog.noContent')}</p>}
+
+  {
+    tutorials.length > 0 && (
+      <>
+        {/* Cautarea apare doar cand indexul Pagefind exista (dupa `npm run build`). */}
+        <div id="catalog-search" class="mb-6" hidden>
+          <label for="search-input" class="mb-1 block text-sm font-semibold">
+            {t('search.label')}
+          </label>
+          <input
+            id="search-input"
+            type="search"
+            autocomplete="off"
+            placeholder={t('search.placeholder')}
+            data-label-none={t('search.noResults')}
+            data-label-results={t('search.results')}
+            data-label-result={t('search.result')}
+            class="h-[60px] w-full rounded-lg border border-beige-700 bg-beige-300 px-4 dark:border-pastel-blue-900 dark:bg-dark-600"
+          />
+          <div id="search-results" class="mt-4" aria-live="polite" hidden>
+            <p id="search-summary" class="mb-3 text-sm" />
+            <ul id="search-list" class="flex flex-col gap-3" />
+          </div>
+        </div>
+
+        <div id="catalog-browse">
+        {/* Filtrele sunt ascunse pana pornește JavaScript-ul; fara JS lista ramane completa. */}
+        <form id="catalog-filters" class="mb-6 flex flex-wrap items-end gap-4" hidden>
+          <label class="flex flex-col gap-1 text-sm font-semibold">
+            {t('catalog.filter.domain')}
+            <select id="filter-domain" class={selectClass}>
+              <option value="">{t('catalog.filter.all')}</option>
+              {domains.map((d) => (
+                <option value={d}>{t(`domain.${d}`)}</option>
+              ))}
+            </select>
+          </label>
+          <label class="flex flex-col gap-1 text-sm font-semibold">
+            {t('catalog.filter.level')}
+            <select id="filter-level" class={selectClass}>
+              <option value="">{t('catalog.filter.all')}</option>
+              {levels.map((l) => (
+                <option value={l}>{t(`level.${l}`)}</option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="button"
+            id="filter-reset"
+            class="cursor-pointer rounded-lg border border-beige-700 px-3 py-2 text-sm hover:border-green-500 dark:border-dark-400 dark:hover:border-pastel-blue-500"
+          >
+            {t('catalog.reset')}
+          </button>
+        </form>
+
+        <p id="catalog-count" class="mb-4 text-sm" aria-live="polite" data-label={t('catalog.results')}>
+          {tutorials.length} {t('catalog.results')}
+        </p>
+
+        <div id="catalog-list" class="flex flex-col gap-12">
+          {domains.map((d) => (
+            <section data-domain-section={d} aria-labelledby={`domain-${d}`}>
+              <div class="mb-6 flex items-center gap-3 border-b border-beige-600 pb-3 dark:border-white/10">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-500/15 text-blue-600 dark:text-pastel-blue-500" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5" /></svg>
+                </span>
+                <h2 id={`domain-${d}`} class="flex-1 text-xl font-bold sm:text-2xl">
+                  {t(`domain.${d}`)}
+                </h2>
+                <a href={`?domain=${d}`} class="text-xs font-bold uppercase tracking-wider text-green-600 hover:text-blue-600 dark:text-dark-100 dark:hover:text-pastel-blue-500">
+                  {t('catalog.viewAll')}
+                </a>
+              </div>
+              <ul class="grid gap-9 sm:grid-cols-2 lg:grid-cols-3">
+                {tutorials
+                  .filter((entry) => entry.data.domain === d)
+                  .map((entry) => (
+                    <TutorialCard entry={entry} lang={lang} />
+                  ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+
+        <p id="catalog-empty" class="mt-4" hidden>
+          {t('catalog.empty')}
+        </p>
+        </div>
+      </>
+    )
+  }
+</section>
+</div>
+
+<script>
+  import '../scripts/progress-ui';
+  import '../scripts/catalog-search';
+</script>
+
+<script>
+  const form = document.getElementById('catalog-filters') as HTMLFormElement | null;
+  const domainSelect = document.getElementById('filter-domain') as HTMLSelectElement | null;
+  const levelSelect = document.getElementById('filter-level') as HTMLSelectElement | null;
+  const resetButton = document.getElementById('filter-reset');
+  const count = document.getElementById('catalog-count');
+  const empty = document.getElementById('catalog-empty');
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('#catalog-list li[data-domain]'));
+  const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-domain-section]'));
+
+  if (form && domainSelect && levelSelect && count && empty) {
+    const apply = () => {
+      const domain = domainSelect.value;
+      const level = levelSelect.value;
+      let visible = 0;
+
+      for (const card of cards) {
+        const show =
+          (!domain || card.dataset.domain === domain) && (!level || card.dataset.level === level);
+        card.hidden = !show;
+        if (show) visible += 1;
+      }
+
+      // Sectiunile fara niciun tutorial vizibil dispar.
+      for (const section of sections) {
+        section.hidden = !section.querySelector('li:not([hidden])');
+      }
+
+      count.textContent = `${visible} ${count.dataset.label ?? ''}`;
+      empty.hidden = visible > 0;
+
+      // Starea filtrelor ramane in URL, ca sa poata fi partajata.
+      const params = new URLSearchParams();
+      if (domain) params.set('domain', domain);
+      if (level) params.set('level', level);
+      const query = params.toString();
+      history.replaceState(null, '', query ? `?${query}` : location.pathname);
+    };
+
+    const params = new URLSearchParams(location.search);
+    const initialDomain = params.get('domain') ?? '';
+    const initialLevel = params.get('level') ?? '';
+    // Setam valorile doar daca exista ca optiune, ca sa ignoram parametrii invalizi.
+    if (Array.from(domainSelect.options).some((o) => o.value === initialDomain)) {
+      domainSelect.value = initialDomain;
+    }
+    if (Array.from(levelSelect.options).some((o) => o.value === initialLevel)) {
+      levelSelect.value = initialLevel;
+    }
+
+    domainSelect.addEventListener('change', apply);
+    levelSelect.addEventListener('change', apply);
+    resetButton?.addEventListener('click', () => {
+      domainSelect.value = '';
+      levelSelect.value = '';
+      apply();
+    });
+
+    form.hidden = false;
+    apply();
+  }
+</script>

@@ -1,0 +1,22 @@
+---
+import { buttonClass, type ButtonSize, type ButtonVariant } from './styles';
+
+interface Props {
+  href: string;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  /** Link catre alt site: se deschide in tab nou, fara referrer. */
+  external?: boolean;
+  class?: string;
+}
+
+const { href, variant = 'primary', size = 'md', external = false, class: extra = '' } = Astro.props;
+---
+
+<a
+  href={href}
+  class={`${buttonClass(variant, size)} ${extra}`}
+  {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+>
+  <slot />
+</a>

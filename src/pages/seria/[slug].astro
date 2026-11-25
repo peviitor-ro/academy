@@ -1,0 +1,20 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SeriesContent from '../../components/SeriesContent.astro';
+import { getSeries, getTutorials, type Series } from '../../lib/tutorials';
+
+export async function getStaticPaths() {
+  const series = getSeries(await getTutorials('ro'));
+  return series.map((item) => ({ params: { slug: item.slug }, props: { series: item } }));
+}
+
+interface Props {
+  series: Series;
+}
+
+const { series } = Astro.props;
+---
+
+<Layout title={series.name} description={`Seria: ${series.name}`}>
+  <SeriesContent series={series} lang="ro" />
+</Layout>

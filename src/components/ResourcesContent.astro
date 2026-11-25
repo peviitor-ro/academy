@@ -1,0 +1,105 @@
+---
+import PageBackdrop from './ui/PageBackdrop.astro';
+import { cardClass, eyebrowClass, gradientTextClass } from './ui/styles';
+
+interface Props {
+  lang: 'ro' | 'en';
+}
+
+const { lang } = Astro.props;
+
+// Doar site-uri oficiale, stabile. Descrierile sunt scurte si neutre.
+const groups = {
+  ro: {
+    eyebrow: 'Resurse',
+    title: 'Resurse utile',
+    text: 'Documentație oficială și instrumente gratuite, ca să nu cauți prin zeci de site-uri. Se deschid în tab nou.',
+    open: 'Deschide',
+    sections: [
+      { title: 'Instrumente', items: [
+        { name: 'Visual Studio Code', text: 'Editor de cod gratuit.', href: 'https://code.visualstudio.com/' },
+        { name: 'Git', text: 'Sistemul de versionare folosit în aproape orice proiect.', href: 'https://git-scm.com/' },
+        { name: 'Node.js', text: 'Rulează JavaScript în afara browserului.', href: 'https://nodejs.org/' },
+        { name: 'GitHub Desktop', text: 'Interfață grafică pentru Git și GitHub.', href: 'https://desktop.github.com/' },
+      ] },
+      { title: 'Documentație', items: [
+        { name: 'MDN Web Docs', text: 'Referința pentru HTML, CSS și JavaScript.', href: 'https://developer.mozilla.org/' },
+        { name: 'Pro Git', text: 'Cartea oficială despre Git, gratuită.', href: 'https://git-scm.com/book' },
+        { name: 'GitHub Docs', text: 'Ghiduri pentru repository-uri, issues și pull request-uri.', href: 'https://docs.github.com/' },
+        { name: 'Astro Docs', text: 'Framework-ul cu care e construit acest site.', href: 'https://docs.astro.build/' },
+        { name: 'Tailwind CSS', text: 'Documentația pentru stilurile folosite aici.', href: 'https://tailwindcss.com/docs' },
+        { name: 'Python', text: 'Documentația oficială a limbajului.', href: 'https://docs.python.org/3/' },
+      ] },
+      { title: 'AI', items: [
+        { name: 'Claude Docs', text: 'Documentația API-ului Claude, de la primul apel la unelte.', href: 'https://docs.claude.com/' },
+        { name: 'Ghid de prompturi (Anthropic)', text: 'Cum scrii instrucțiuni clare pentru un model de limbaj.', href: 'https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/overview' },
+        { name: 'OpenAI Docs', text: 'Documentația platformei OpenAI și a API-ului.', href: 'https://platform.openai.com/docs' },
+        { name: 'Gemini API', text: 'Documentația Google pentru modelele Gemini.', href: 'https://ai.google.dev/gemini-api/docs' },
+        { name: 'Hugging Face Docs', text: 'Modele deschise, biblioteci și seturi de date.', href: 'https://huggingface.co/docs' },
+      ] },
+    ],
+  },
+  en: {
+    eyebrow: 'Resources',
+    title: 'Useful resources',
+    text: 'Official documentation and free tools, so you do not have to search dozens of sites. They open in a new tab.',
+    open: 'Open',
+    sections: [
+      { title: 'Tools', items: [
+        { name: 'Visual Studio Code', text: 'Free code editor.', href: 'https://code.visualstudio.com/' },
+        { name: 'Git', text: 'The version control system used in almost every project.', href: 'https://git-scm.com/' },
+        { name: 'Node.js', text: 'Runs JavaScript outside the browser.', href: 'https://nodejs.org/' },
+        { name: 'GitHub Desktop', text: 'Graphical interface for Git and GitHub.', href: 'https://desktop.github.com/' },
+      ] },
+      { title: 'Documentation', items: [
+        { name: 'MDN Web Docs', text: 'The reference for HTML, CSS and JavaScript.', href: 'https://developer.mozilla.org/' },
+        { name: 'Pro Git', text: 'The official book about Git, free.', href: 'https://git-scm.com/book' },
+        { name: 'GitHub Docs', text: 'Guides for repositories, issues and pull requests.', href: 'https://docs.github.com/' },
+        { name: 'Astro Docs', text: 'The framework this site is built with.', href: 'https://docs.astro.build/' },
+        { name: 'Tailwind CSS', text: 'Documentation for the styles used here.', href: 'https://tailwindcss.com/docs' },
+        { name: 'Python', text: 'The official language documentation.', href: 'https://docs.python.org/3/' },
+      ] },
+      { title: 'AI', items: [
+        { name: 'Claude Docs', text: 'Documentation for the Claude API, from the first call to tools.', href: 'https://docs.claude.com/' },
+        { name: 'Prompt engineering guide (Anthropic)', text: 'How to write clear instructions for a language model.', href: 'https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/overview' },
+        { name: 'OpenAI Docs', text: 'Documentation for the OpenAI platform and API.', href: 'https://platform.openai.com/docs' },
+        { name: 'Gemini API', text: 'Google documentation for the Gemini models.', href: 'https://ai.google.dev/gemini-api/docs' },
+        { name: 'Hugging Face Docs', text: 'Open models, libraries and datasets.', href: 'https://huggingface.co/docs' },
+      ] },
+    ],
+  },
+}[lang];
+---
+
+<div class="relative overflow-hidden">
+  <PageBackdrop />
+
+  <section class="mx-auto max-w-3xl px-6 pt-12 pb-14 text-center md:pt-16">
+    <p class={`mb-4 ${eyebrowClass}`}>{groups.eyebrow}</p>
+    <h1 class={`text-4xl leading-tight font-extrabold tracking-tight md:text-6xl ${gradientTextClass}`}>{groups.title}</h1>
+    <p class="mx-auto mt-5 max-w-xl text-lg text-green-600 dark:text-dark-100">{groups.text}</p>
+  </section>
+
+  {groups.sections.map((section) => (
+    <section class="mx-auto max-w-5xl px-6 pb-14">
+      <h2 class="mb-5 text-2xl font-bold dark:text-white">{section.title}</h2>
+      <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {section.items.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class={`${cardClass} group block h-full p-5 transition hover:-translate-y-0.5 hover:border-blue-500 dark:hover:border-pastel-blue-500`}
+            >
+              <span class="block font-semibold group-hover:underline">{item.name} <span aria-hidden="true">↗</span></span>
+              <span class="mt-1 block text-sm text-green-600 dark:text-dark-100">{item.text}</span>
+              <span class="sr-only"> ({groups.open}, tab nou)</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+  <div class="pb-10"></div>
+</div>

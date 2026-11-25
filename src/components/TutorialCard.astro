@@ -1,0 +1,80 @@
+---
+import { getTutorialSlug, type Tutorial } from '../lib/tutorials';
+import { useTranslation, useTranslatedPath } from '../i18n/utils';
+
+interface Props {
+  entry: Tutorial;
+  lang: 'ro' | 'en';
+}
+
+const { entry, lang } = Astro.props;
+const t = useTranslation(lang);
+const translatePath = useTranslatedPath(lang);
+const href = `${translatePath('tutorials')}/${getTutorialSlug(entry)}/`;
+const { title, description, domain, level, series, durationMin, videoUrl } = entry.data;
+
+// Culorile nivelurilor sunt cele din designul Figma (Badge Component).
+const levelColor = {
+  beginner: 'bg-[#81c784]',
+  intermediate: 'bg-[#ffb74d]',
+  advanced: 'bg-[#26c6da]',
+}[level];
+---
+
+<li data-domain={domain} data-level={level}>
+  <a
+    href={href}
+    class="group flex h-full flex-col overflow-hidden rounded-xl border border-beige-700 bg-beige-300 transition-colors duration-300 hover:border-green-500 dark:border-pastel-blue-900 dark:bg-dark-600 dark:hover:border-blue-400"
+  >
+    <div
+      class="relative h-48 bg-gradient-to-br from-green-100 to-beige-500 dark:from-blue-800 dark:to-dark-500"
+    >
+      <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-beige-300 dark:from-dark-600"></div>
+      <div class="absolute top-4 left-4 flex flex-wrap items-center gap-2 text-xs font-semibold">
+        <span class="rounded-full bg-green-500 px-3 py-1 text-beige-50 dark:bg-blue-500 dark:text-pastel-blue-200">
+          {t(`domain.${domain}`)}
+        </span>
+        <span class={`rounded-full px-3 py-1 text-pastel-blue-50 ${levelColor}`}>
+          {t(`level.${level}`)}
+        </span>
+        <span
+          data-seen-id={entry.id}
+          hidden
+          class="rounded-full bg-beige-50 px-3 py-1 text-green-800 dark:bg-dark-500 dark:text-pastel-blue-300"
+        >
+          ✓ {t('progress.seen')}
+        </span>
+      </div>
+    </div>
+
+    <div class="flex flex-1 flex-col gap-2 p-6">
+      <h3 class="text-2xl font-semibold text-green-600 dark:text-blue-400">{title}</h3>
+      <p class="text-base leading-relaxed text-beige-900 dark:text-blue-100">{description}</p>
+      <div class="mt-auto flex items-center justify-between gap-3 pt-3">
+        <p class="text-xs text-beige-800 dark:text-dark-200">
+          {series}
+          {durationMin && ` · ${durationMin} ${t('tutorial.minutes')}`}
+          {videoUrl && ' · ▶ Video'}
+        </p>
+        <span
+          class="flex shrink-0 items-center gap-3 text-xs font-semibold tracking-[0.6px] text-green-600 dark:text-blue-400"
+        >
+          {t('series.start')}
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 7v13M3 5.5A1.5 1.5 0 0 1 4.5 4H9a3 3 0 0 1 3 3 3 3 0 0 1 3-3h4.5A1.5 1.5 0 0 1 21 5.5v12a1.5 1.5 0 0 1-1.5 1.5H15a3 3 0 0 0-3 3 3 3 0 0 0-3-3H4.5A1.5 1.5 0 0 1 3 17.5z"></path>
+          </svg>
+        </span>
+      </div>
+    </div>
+  </a>
+</li>

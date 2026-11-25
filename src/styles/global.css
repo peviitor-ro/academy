@@ -1,2 +1,16 @@
 @import "tailwindcss";
 @config "../../tailwind.config.cjs";
+
+/* Pagina de start: aurora animata si aparitii la scroll. Respecta prefers-reduced-motion. */
+.home-grid {
+  background-image:
+    linear-gradient(to right, rgb(100 116 139 / 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(100 116 139 / 0.12) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at 50% 30%, black 20%, transparent 70%);
+}
+.js-reveal .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.js-reveal .reveal.is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .js-reveal .reveal { opacity: 1; transform: none; transition: none; }
+}

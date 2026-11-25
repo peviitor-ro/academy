@@ -1,3 +1,4 @@
+// Paleta din designul Figma (AOC-Learning): indigo, pastel-blue, bej, verde-maslin, dark.
 module.exports = {
   content: ['./src/**/*.{astro,html,js,ts,jsx,tsx}', './public/**/*.html'],
   darkMode: 'class',
@@ -16,6 +17,16 @@ module.exports = {
         'green-700': '#40462f',
         'green-800': '#323624',
         'green-900': '#26291c',
+        'blue-50': '#ededfc',
+        'blue-100': '#c8c6f7',
+        'blue-200': '#aeaaf3',
+        'blue-300': '#8983ee',
+        'blue-400': '#726bea',
+        'blue-500': '#4f46e5',
+        'blue-600': '#4840d0',
+        'blue-700': '#3832a3',
+        'blue-800': '#2b277e',
+        'blue-900': '#211d60',
         'pastel-blue-50': '#f9f9ff',
         'pastel-blue-100': '#ecebff',
         'pastel-blue-200': '#e3e2ff',

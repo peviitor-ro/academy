@@ -1,0 +1,121 @@
+---
+import PageBackdrop from './ui/PageBackdrop.astro';
+import Button from './ui/Button.astro';
+import { cardClass, eyebrowClass, gradientTextClass } from './ui/styles';
+import { getSeries, getTutorialSlug, getTutorials } from '../lib/tutorials';
+import { useTranslatedPath } from '../i18n/utils';
+import { DISCORD_URL, ISSUES_URL, REPO_URL } from '../lib/links';
+
+interface Props {
+  lang: 'ro' | 'en';
+}
+
+const { lang } = Astro.props;
+const translatePath = useTranslatedPath(lang);
+
+const tutorials = await getTutorials(lang);
+// Lectiile despre contributie traiesc in seria `start-academia`, nu in prima serie din catalog.
+const lessons = getSeries(tutorials).find((series) => series.slug === 'start-academia')?.lessons ?? [];
+const lessonHref = (index: number) =>
+  lessons[index] ? `${translatePath('tutorials')}/${getTutorialSlug(lessons[index])}/` : translatePath('catalog');
+
+const copy = {
+  ro: {
+    eyebrow: 'Implică-te',
+    title: 'Academia o facem împreună',
+    text: 'Tot ce vezi aici e scris de voluntari. Alege cum vrei să ajuți: o lecție, o corectură, o pagină sau o întrebare bine pusă.',
+    waysTitle: 'Cum poți ajuta',
+    ways: [
+      { title: 'Scrie sau corectează o lecție', text: 'Lecțiile sunt fișiere Markdown în repository. Găsești o greșeală? Fiecare lecție are linkul „Editează pe GitHub”.', cta: 'Vezi lecțiile', href: translatePath('catalog'), external: false },
+      { title: 'Raportează o problemă sau propune o idee', text: 'Ai găsit o eroare pe site sau ai o idee pentru o lecție? Deschide un issue, cu cât mai multe detalii.', cta: 'Deschide un issue', href: ISSUES_URL, external: true },
+      { title: 'Ajută la dezvoltarea site-ului', text: 'Site-ul e construit cu Astro și Tailwind. Caută issue-urile mici, pornite pentru începători.', cta: 'Vezi repository-ul', href: REPO_URL, external: true },
+      { title: 'Devino mentor', text: 'Ai experiență și poți răspunde la întrebări? Spune-ne pe Discord și te adăugăm în lista de mentori, cu acordul tău.', cta: 'Vezi mentorii', href: translatePath('mentors'), external: false },
+    ],
+    stepsTitle: 'Primul tău pull request, în trei pași',
+    steps: [
+      { title: 'Pornește proiectul local', text: 'Clonezi repository-ul și rulezi site-ul pe calculatorul tău.', cta: 'Citește lecția', href: lessonHref(0) },
+      { title: 'Fă o modificare mică', text: 'Corectează o frază sau adaugă un link, apoi salvează modificarea într-un commit.', cta: null, href: '' },
+      { title: 'Trimite pull request-ul', text: 'Urmează pașii din lecția despre primul pull request, iar un mentor îl verifică.', cta: 'Citește lecția', href: lessonHref(1) },
+    ],
+    stepLabel: 'Pasul',
+    helpTitle: 'Ai nevoie de ajutor?',
+    helpText: 'Întreabă în comunitate pe Discord. Spune ce ai încercat și ce eroare a apărut.',
+    discord: 'Intră pe Discord',
+  },
+  en: {
+    eyebrow: 'Get involved',
+    title: 'We build the academy together',
+    text: 'Everything you see here is written by volunteers. Pick how you want to help: a lesson, a fix, a page or a well-asked question.',
+    waysTitle: 'Ways to help',
+    ways: [
+      { title: 'Write or fix a lesson', text: 'Lessons are Markdown files in the repository. Found a mistake? Every lesson has an “Edit on GitHub” link.', cta: 'See the lessons', href: translatePath('catalog'), external: false },
+      { title: 'Report a problem or suggest an idea', text: 'Found a bug on the site or have an idea for a lesson? Open an issue with as many details as you can.', cta: 'Open an issue', href: ISSUES_URL, external: true },
+      { title: 'Help build the site', text: 'The site is built with Astro and Tailwind. Look for small issues meant for beginners.', cta: 'See the repository', href: REPO_URL, external: true },
+      { title: 'Become a mentor', text: 'Have experience and can answer questions? Tell us on Discord and we will add you to the mentor list, with your consent.', cta: 'See the mentors', href: translatePath('mentors'), external: false },
+    ],
+    stepsTitle: 'Your first pull request, in three steps',
+    steps: [
+      { title: 'Run the project locally', text: 'Clone the repository and run the site on your computer.', cta: 'Read the lesson', href: lessonHref(0) },
+      { title: 'Make a small change', text: 'Fix a sentence or add a link, then save the change in a commit.', cta: null, href: '' },
+      { title: 'Send the pull request', text: 'Follow the lesson about your first pull request, and a mentor will review it.', cta: 'Read the lesson', href: lessonHref(1) },
+    ],
+    stepLabel: 'Step',
+    helpTitle: 'Need help?',
+    helpText: 'Ask in the community on Discord. Say what you tried and what error you got.',
+    discord: 'Join Discord',
+  },
+}[lang];
+---
+
+<div class="relative overflow-hidden">
+  <PageBackdrop />
+
+  <section class="mx-auto max-w-3xl px-6 pt-12 pb-14 text-center md:pt-16">
+    <p class={`mb-4 ${eyebrowClass}`}>{copy.eyebrow}</p>
+    <h1 class={`text-4xl leading-tight font-extrabold tracking-tight md:text-6xl ${gradientTextClass}`}>{copy.title}</h1>
+    <p class="mx-auto mt-5 max-w-xl text-lg text-green-600 dark:text-dark-100">{copy.text}</p>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-6 pb-16">
+    <h2 class="mb-6 text-2xl font-bold md:text-3xl dark:text-white">{copy.waysTitle}</h2>
+    <ul class="grid gap-4 md:grid-cols-2">
+      {copy.ways.map((way) => (
+        <li class={`${cardClass} flex flex-col p-6`}>
+          <h3 class="mb-2 text-lg font-bold">{way.title}</h3>
+          <p class="mb-5 flex-1 text-sm text-green-600 dark:text-dark-100">{way.text}</p>
+          <div>
+            <Button href={way.href} variant="secondary" size="sm" external={way.external}>{way.cta}</Button>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-6 pb-16">
+    <h2 class="mb-6 text-2xl font-bold md:text-3xl dark:text-white">{copy.stepsTitle}</h2>
+    <ol class="grid gap-4 md:grid-cols-3">
+      {copy.steps.map((step, index) => (
+        <li class={`${cardClass} flex flex-col p-6`}>
+          <span class="mb-3 inline-block self-start rounded-full border border-blue-500/60 px-3 py-1 font-mono text-xs font-bold text-blue-800 dark:text-pastel-blue-400">
+            {copy.stepLabel} {index + 1}
+          </span>
+          <h3 class="mb-2 text-lg font-bold">{step.title}</h3>
+          <p class="mb-5 flex-1 text-sm text-green-600 dark:text-dark-100">{step.text}</p>
+          {step.cta && (
+            <div>
+              <Button href={step.href} variant="secondary" size="sm">{step.cta}</Button>
+            </div>
+          )}
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="mx-auto max-w-3xl px-6 pb-24 text-center">
+    <div class={`${cardClass} p-8`}>
+      <h2 class="mb-2 text-2xl font-bold dark:text-white">{copy.helpTitle}</h2>
+      <p class="mb-6 text-green-600 dark:text-dark-100">{copy.helpText}</p>
+      <Button href={DISCORD_URL} external>{copy.discord}</Button>
+    </div>
+  </section>
+</div>

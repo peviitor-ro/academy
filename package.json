@@ -7,16 +7,20 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "check": "astro check"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.12",
     "@iconify-json/ri": "^1.2.10",
+    "pagefind": "^1.6.0",
     "prettier": "^3.5.1",
     "sass": "^1.85.0",
     "stylelint": "^16.14.1",
-    "stylelint-config-standard-scss": "^14.0.0"
+    "stylelint-config-standard-scss": "^14.0.0",
+    "typescript": "^6.0.3"
   },
   "dependencies": {
     "@iconify-json/bx": "^1.2.3",

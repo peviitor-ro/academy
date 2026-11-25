@@ -1,0 +1,119 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { withBase } from '../i18n/utils';
+import PageBackdrop from '../components/ui/PageBackdrop.astro';
+import { buttonClass } from '../components/ui/styles';
+
+// Pe un site static, 404.html se serveste pentru orice adresa inexistenta, inclusiv /en/...
+// Limba se alege in browser dupa adresa; fara JavaScript ramane romana.
+const copy = {
+  ro: {
+    badge: 'Eroare 404',
+    title: 'Traseu de învățare întrerupt',
+    text: 'Pagina pe care o cauți nu există sau a fost mutată. Poți porni de la început sau poți căuta lecția direct.',
+    home: 'Acasă',
+    catalog: 'Vezi catalogul',
+    search: 'Caută în tutoriale',
+    searchButton: 'Caută',
+    placeholder: 'De exemplu „git” sau „pull request”',
+    status: 'cod_stare',
+    path: 'cale',
+    homeHref: withBase('/'),
+    catalogHref: withBase('/catalog'),
+  },
+  en: {
+    badge: 'Error 404',
+    title: 'Learning path interrupted',
+    text: 'The page you are looking for does not exist or was moved. Start over, or search for the lesson directly.',
+    home: 'Home',
+    catalog: 'See the catalog',
+    search: 'Search tutorials',
+    searchButton: 'Search',
+    placeholder: 'For example “git” or “pull request”',
+    status: 'status_code',
+    path: 'path',
+    homeHref: withBase('/en/'),
+    catalogHref: withBase('/en/catalog'),
+  },
+};
+const t = copy.ro;
+const primaryButton = buttonClass('primary');
+const secondaryButton = buttonClass('secondary');
+---
+
+<Layout title="404" description="Pagina nu a fost găsită.">
+  <div class="relative overflow-hidden">
+    <PageBackdrop />
+
+    <section class="mx-auto grid max-w-6xl items-center gap-12 px-6 py-16 md:grid-cols-2 md:py-24">
+      <div>
+        <span
+          data-i18n="badge"
+          class="mb-6 inline-block rounded-full bg-red-600/90 px-3 py-1 font-mono text-xs font-bold tracking-widest text-white uppercase"
+        >{t.badge}</span>
+        <h1 data-i18n="title" class="bg-gradient-to-r from-blue-500 via-blue-300 to-blue-600 bg-clip-text text-4xl leading-tight font-extrabold tracking-tight text-transparent md:text-6xl dark:from-pastel-blue-500 dark:via-blue-400 dark:to-blue-300">
+          {t.title}
+        </h1>
+        <p data-i18n="text" class="mt-6 max-w-lg text-lg text-green-600 dark:text-dark-100">{t.text}</p>
+
+        <form id="nf-search" action={t.catalogHref} method="get" role="search" class="mt-8 flex max-w-lg gap-2">
+          <label for="nf-q" class="sr-only" data-i18n="search">{t.search}</label>
+          <input
+            id="nf-q"
+            name="q"
+            type="search"
+            autocomplete="off"
+            placeholder={t.placeholder}
+            data-i18n-attr="placeholder:placeholder"
+            class="h-12 min-w-0 flex-1 rounded-full border border-beige-600 bg-white/80 px-5 backdrop-blur focus:border-blue-500 focus:outline-none dark:border-white/15 dark:bg-white/5 dark:focus:border-pastel-blue-500"
+          />
+          <button type="submit" data-i18n="searchButton" class={primaryButton}>{t.searchButton}</button>
+        </form>
+
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a id="nf-home" href={t.homeHref} data-i18n="home" class={primaryButton}>{t.home}</a>
+          <a id="nf-catalog" href={t.catalogHref} data-i18n="catalog" class={secondaryButton}>{t.catalog}</a>
+        </div>
+      </div>
+
+      {/* Fereastra de cod: arata adresa care nu a fost gasita. */}
+      <div class="overflow-hidden rounded-2xl border border-dark-400 bg-dark-600 text-dark-50 shadow-xl">
+        <div class="flex gap-1.5 border-b border-white/10 px-4 py-3" aria-hidden="true">
+          <span class="h-3 w-3 rounded-full bg-red-400/80"></span>
+          <span class="h-3 w-3 rounded-full bg-amber-300/80"></span>
+          <span class="h-3 w-3 rounded-full bg-emerald-400/80"></span>
+        </div>
+        <pre class="overflow-x-auto p-6 font-mono text-sm leading-7"><code><span class="text-pastel-blue-600">function</span> <span class="text-pastel-blue-500">gasesteLectia</span>() &#123;
+  <span class="text-pastel-blue-600">const</span> cale = <span class="text-amber-300" id="nf-path">"/"</span>;
+  <span class="text-pastel-blue-600">throw new</span> Error(<span class="text-amber-300">"LectieNegasita"</span>);
+&#125;
+
+<span class="text-green-500"><span data-i18n="status">{t.status}</span>: <span class="text-red-300">404_NEGASIT</span></span>
+<span class="text-green-500"><span data-i18n="path">{t.path}</span>: <span id="nf-path2" class="text-dark-100">/</span></span></code></pre>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<script define:vars={{ copy }}>
+  const path = location.pathname;
+  const base = document.querySelector('link[rel="icon"]')?.getAttribute('href')?.replace(/favicon\.svg$/, '') ?? '/';
+  const isEn = path.startsWith(base + 'en/') || path === base + 'en';
+  const t = isEn ? copy.en : copy.ro;
+
+  document.documentElement.lang = isEn ? 'en' : 'ro';
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
+    el.textContent = t[el.dataset.i18n];
+  });
+  document.querySelectorAll('[data-i18n-attr]').forEach((el) => {
+    const [attr, key] = el.dataset.i18nAttr.split(':');
+    el.setAttribute(attr, t[key]);
+  });
+  document.getElementById('nf-home').href = t.homeHref;
+  document.getElementById('nf-catalog').href = t.catalogHref;
+  document.getElementById('nf-search').action = t.catalogHref;
+  for (const id of ['nf-path', 'nf-path2']) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = id === 'nf-path' ? JSON.stringify(path) : path;
+  }
+</script>
